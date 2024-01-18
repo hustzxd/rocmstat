@@ -12,6 +12,7 @@ def main():
     n_devices = len(utilizations)
     pid_user_list = get_pid_user(n_devices)
     memory_total_list, memory_used_list = get_memory()
+    productnames = get_productname()
     hostname = open("/proc/sys/kernel/hostname", "r").readline().strip()
     print(f"{hostname}\t {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} \t version: {get_version()}")
     for gpu_id in range(n_devices):
@@ -26,8 +27,16 @@ def main():
                 temperature=temperatures[gpu_id],
                 utilization=utilizations[gpu_id],
                 pid_user=pid_user_list[gpu_id],
+                productname=productnames[gpu_id],
             )
         )
+
+def get_productname():
+    os.system("rocm-smi --showproductname | grep series:>tmp")
+    productnames = [x.split()[6] for x in open("tmp", "r").readlines()]
+    os.system("rm tmp")
+    return productnames
+
 
 def get_version():
     os.system("apt-cache show rocm-libs | grep Version > tmp")
@@ -71,8 +80,9 @@ def get_memory():
     memory_total = memory[0::2]
     return memory_total, memory_used
 
-def gpu_info_format(gpu_id, memory_used, memory_total, temperature, utilization, pid_user):
+def gpu_info_format(gpu_id, memory_used, memory_total, temperature, utilization, pid_user, productname):
     return f"{Fore.GREEN}[{gpu_id}]{Fore.RESET} | \
+{Fore.CYAN}{productname}{Fore.RESET} \
 {Fore.LIGHTRED_EX}{temperature:2}°C{Fore.RESET} \
 {Fore.LIGHTBLUE_EX}{utilization:3} %{Fore.RESET} | \
 {Fore.YELLOW}{memory_used:5}{Fore.RESET} / \
