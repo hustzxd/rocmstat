@@ -4,3 +4,6 @@
 # in the python environment (e.g. Travis CI; see .travis.yml).
 
 # vim: set ft=conf:
+
+pyamdgpuinfo
+colorama
