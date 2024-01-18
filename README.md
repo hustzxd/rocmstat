@@ -14,4 +14,4 @@ source .zshrc # or .bashrc
 ```bash
 rocmstat
 ```
-<img width='400' alt='image' src='screenshot.png'>
+<img width='400' alt='image' src='rocmstat.jpg'>
