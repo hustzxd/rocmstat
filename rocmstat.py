@@ -62,13 +62,19 @@ def get_pid_user(n_devices):
     for line in info:
         if pid != 0:
             for i in line.split():
-                pid_user_list[int(i)] += f" {user}/{pid}"
+                try:
+                    pid_user_list[int(i)] += f" {user}/{pid}"
+                except:
+                    pass
         pid = 0
         user = ""
         if "PID" in line and "DRM" in line:
             pid = int(line.split()[1])
             os.system(f"ps -u -p {pid} | grep {pid}>tmp")
-            user = open("tmp", "r").readline().split()[0]
+            try:
+                user = open("tmp", "r").readline().split()[0]
+            except:
+                pass
             os.system("rm tmp")
     return pid_user_list
 
