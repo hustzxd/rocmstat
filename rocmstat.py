@@ -39,16 +39,26 @@ def get_productname():
 
 
 def get_version():
-    os.system("apt-cache show rocm-libs | grep Version > tmp")
-    version = open("tmp", "r").readline().split()[-1]
+    try:
+        os.system("apt-cache show rocm-libs | grep Version > tmp")
+        version = open("tmp", "r").readline().split()[-1]
+    except:
+        version = "None"
     os.system("rm tmp")
     return version
     
 
 def get_utilization_temp():
-    os.system("rocm-smi |grep W | grep c >tmp")
-    utilization = [int(x.split()[9][:-1]) for x in open("tmp", "r").readlines()]
-    temp = [float(x.split()[1][:-1]) for x in open("tmp", "r").readlines()]
+    try:
+        os.system("rocm-smi |grep W | grep c >tmp")
+        utilization = [int(x.split()[9][:-1]) for x in open("tmp", "r").readlines()]
+        temp = [float(x.split()[1][:-1]) for x in open("tmp", "r").readlines()]
+        if len(utilization) == 0:
+            raise ValueError
+    except:
+        utilization = [0 for i in range(8)]
+        temp = [0 for i in range(8)]
+
     os.system("rm tmp")
     return utilization, temp
 
@@ -60,7 +70,7 @@ def get_pid_user(n_devices):
     pid = 0
     user = ""
     for line in info:
-        if pid != 0:
+        if pid != 0 and ("PID" not in line):
             for i in line.split():
                 pid_user_list[int(i)] += f" {user}/{pid}"
         pid = 0
